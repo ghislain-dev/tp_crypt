@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>SecureCrypt - Chiffrement RSA Moderne</title>
+    <title>SecureCrypt - RSA, AES & Chiffrement Hybride</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.3.2/jsencrypt.min.js"></script>
@@ -16,6 +16,9 @@
             --danger: #f72585;
             --dark: #1e1e2f;
             --light: #f8f9fa;
+            --rsa-color: #ef476f;
+            --aes-color: #06d6a0;
+            --hybrid-color: #ffd166;
         }
 
         * {
@@ -111,6 +114,10 @@
             font-weight: bold;
         }
 
+        .card-header.rsa { background: linear-gradient(135deg, var(--rsa-color), #d90429); }
+        .card-header.aes { background: linear-gradient(135deg, var(--aes-color), #118ab2); }
+        .card-header.hybrid { background: linear-gradient(135deg, var(--hybrid-color), #f4a261); color: #333; }
+
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
@@ -123,6 +130,10 @@
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
         }
+
+        .btn-rsa { background: linear-gradient(135deg, var(--rsa-color), #d90429); border: none; color: white; }
+        .btn-aes { background: linear-gradient(135deg, var(--aes-color), #118ab2); border: none; color: white; }
+        .btn-hybrid { background: linear-gradient(135deg, var(--hybrid-color), #f4a261); border: none; color: #333; }
 
         textarea, input {
             border-radius: 10px !important;
@@ -163,6 +174,31 @@
             margin-bottom: 20px;
         }
 
+        .method-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .method-tab {
+            padding: 10px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            transition: all 0.3s;
+        }
+        .method-tab.active {
+            background: white;
+            color: #333;
+        }
+        .method-tab.rsa.active { background: var(--rsa-color); color: white; }
+        .method-tab.aes.active { background: var(--aes-color); color: white; }
+        .method-tab.hybrid.active { background: var(--hybrid-color); color: #333; }
+
+        .method-content { display: none; }
+        .method-content.active { display: block; }
+
         @media (max-width: 768px) {
             .sidebar {
                 min-width: 100%;
@@ -199,16 +235,6 @@
             }
         }
 
-        .example-badge {
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .example-badge:hover {
-            transform: scale(1.05);
-            background: var(--primary) !important;
-        }
-
         .toast-notification {
             position: fixed;
             bottom: 20px;
@@ -226,7 +252,7 @@
         <nav class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <h3><i class="fas fa-lock"></i> SecureCrypt</h3>
-                <p>Chiffrement RSA Moderne</p>
+                <p>RSA | AES | Hybride</p>
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
@@ -262,59 +288,33 @@
             <div id="accueil-page" class="page active-page">
                 <div class="stat-card">
                     <h2><i class="fas fa-shield-alt"></i> Bienvenue sur SecureCrypt</h2>
-                    <p>Plateforme sécurisée de chiffrement asymétrique RSA - Compatible multi-navigateurs</p>
+                    <p>Plateforme complète de chiffrement : RSA (asymétrique), AES (symétrique) et Hybride</p>
                 </div>
-
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-key"></i> Génération de clés RSA (2048 bits)
-                            </div>
+                    <div class="col-md-4">
+                        <div class="card text-center">
                             <div class="card-body">
-                                <button class="btn btn-primary btn-lg w-100" id="generateKeysHome">
-                                    <i class="fas fa-sync-alt"></i> Générer une nouvelle paire de clés RSA
-                                </button>
-                                <hr>
-                                <h6>Clé Publique :</h6>
-                                <div class="key-box" id="publicKeyHome">Aucune clé générée</div>
-                                <h6 class="mt-3">Clé Privée :</h6>
-                                <div class="key-box" id="privateKeyHome">Aucune clé générée</div>
-                                <div class="mt-3">
-                                    <button class="btn btn-sm btn-outline-primary" id="exportPublicHome">
-                                        <i class="fas fa-download"></i> Exporter clé publique
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-secondary" id="exportPrivateHome">
-                                        <i class="fas fa-download"></i> Exporter clé privée
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-info" id="copyPublicHome">
-                                        <i class="fas fa-copy"></i> Copier publique
-                                    </button>
-                                </div>
+                                <i class="fas fa-key fa-3x" style="color: var(--rsa-color);"></i>
+                                <h4 class="mt-3">RSA</h4>
+                                <p>Chiffrement asymétrique<br>Clé publique/privée<br>Idéal pour échange de clés</p>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="card">
-                            <div class="card-header">
-                                <i class="fas fa-chart-line"></i> Instructions importantes
-                            </div>
+                    <div class="col-md-4">
+                        <div class="card text-center">
                             <div class="card-body">
-                                <div class="alert alert-info">
-                                    <i class="fas fa-exchange-alt"></i> <strong>Pour déchiffrer dans un autre navigateur :</strong><br>
-                                    1. Copiez le message chiffré (format Base64)<br>
-                                    2. Copiez la clé privée correspondante<br>
-                                    3. Collez-les dans l'onglet "Déchiffrement"<br>
-                                    4. Cliquez sur "Déchiffrer"
-                                </div>
-                                <div class="alert alert-success">
-                                    <i class="fas fa-check-circle"></i> <strong>RSA-2048 bits</strong><br>
-                                    Compatible entre tous les navigateurs modernes.
-                                </div>
-                                <div class="alert alert-warning">
-                                    <i class="fas fa-clock"></i> <strong>Session locale</strong><br>
-                                    Vos clés ne sont jamais stockées sur un serveur.
-                                </div>
+                                <i class="fas fa-lock fa-3x" style="color: var(--aes-color);"></i>
+                                <h4 class="mt-3">AES</h4>
+                                <p>Chiffrement symétrique<br>Clé unique<br>Rapide pour gros volumes</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <i class="fas fa-code-branch fa-3x" style="color: var(--hybrid-color);"></i>
+                                <h4 class="mt-3">Chiffrement Hybride</h4>
+                                <p>AES + RSA<br>Le meilleur des deux mondes<br>Sécurisé et rapide</p>
                             </div>
                         </div>
                     </div>
@@ -323,35 +323,129 @@
 
             <!-- Page Chiffrement -->
             <div id="chiffrement-page" class="page" style="display:none;">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-lock"></i> Chiffrement RSA
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label>Message à chiffrer :</label>
-                            <textarea id="plainMessage" rows="4" class="form-control" placeholder="Entrez votre message secret..."></textarea>
-                            <small class="text-muted">Maximum 245 caractères pour RSA 2048 bits</small>
+                <div class="method-tabs">
+                    <div class="method-tab rsa active" onclick="switchMethod('rsa-encrypt')">🔐 RSA</div>
+                    <div class="method-tab aes" onclick="switchMethod('aes-encrypt')">🔒 AES</div>
+                    <div class="method-tab hybrid" onclick="switchMethod('hybrid-encrypt')">🔗 Hybride (RSA+AES)</div>
+                </div>
+
+                <!-- RSA Chiffrement -->
+                <div id="rsa-encrypt" class="method-content active">
+                    <div class="card">
+                        <div class="card-header rsa">
+                            <i class="fas fa-key"></i> Chiffrement RSA (Asymétrique)
                         </div>
-                        <div class="mb-3">
-                            <label>Clé Publique (PEM) :</label>
-                            <textarea id="encryptPublicKey" rows="5" class="form-control" placeholder="Collez la clé publique ici..."></textarea>
-                        </div>
-                        <button class="btn btn-primary" id="encryptBtn">
-                            <i class="fas fa-lock"></i> Chiffrer le message
-                        </button>
-                        <hr>
-                        <div class="mb-3">
-                            <label>Message chiffré (Base64) :</label>
-                            <textarea id="encryptedResult" rows="5" class="form-control" readonly placeholder="Le message chiffré apparaîtra ici..."></textarea>
-                            <div class="mt-2">
-                                <button class="btn btn-sm btn-outline-secondary" id="copyEncrypted">
-                                    <i class="fas fa-copy"></i> Copier le message chiffré
-                                </button>
-                                <button class="btn btn-sm btn-outline-success" id="testDecrypt">
-                                    <i class="fas fa-vial"></i> Tester le déchiffrement local
-                                </button>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-download"></i> Génération clés RSA</h6>
+                                    <button class="btn btn-rsa w-100 mb-2" id="genRSAKeysChiff">
+                                        <i class="fas fa-sync-alt"></i> Générer clés RSA
+                                    </button>
+                                    <label>Clé Publique :</label>
+                                    <div class="key-box mb-2" id="rsaPubKeyChiff">Non générée</div>
+                                    <label>Clé Privée :</label>
+                                    <div class="key-box" id="rsaPrivKeyChiff">Non générée</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-lock"></i> Chiffrer avec RSA</h6>
+                                    <textarea id="rsaMessage" class="form-control mb-2" rows="3" placeholder="Message à chiffrer..."></textarea>
+                                    <textarea id="rsaPublicKeyInput" class="form-control mb-2" rows="3" placeholder="Clé publique du destinataire..."></textarea>
+                                    <button class="btn btn-rsa w-100" id="doRSAEncrypt">
+                                        <i class="fas fa-lock"></i> Chiffrer RSA
+                                    </button>
+                                    <hr>
+                                    <label>Message chiffré :</label>
+                                    <textarea id="rsaEncryptedResult" class="form-control" rows="3" readonly placeholder="Résultat..."></textarea>
+                                    <button class="btn btn-sm btn-outline-secondary mt-1" onclick="copyText('rsaEncryptedResult')">
+                                        <i class="fas fa-copy"></i> Copier
+                                    </button>
+                                </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AES Chiffrement -->
+                <div id="aes-encrypt" class="method-content">
+                    <div class="card">
+                        <div class="card-header aes">
+                            <i class="fas fa-lock"></i> Chiffrement AES (Symétrique)
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-download"></i> Génération clé AES</h6>
+                                    <button class="btn btn-aes w-100 mb-2" id="genAESKeyChiff">
+                                        <i class="fas fa-sync-alt"></i> Générer clé AES-256
+                                    </button>
+                                    <label>Clé AES (Base64) :</label>
+                                    <textarea id="aesKeyChiff" class="form-control" rows="2" readonly placeholder="Clé générée..."></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-lock"></i> Chiffrer avec AES</h6>
+                                    <textarea id="aesMessage" class="form-control mb-2" rows="3" placeholder="Message à chiffrer..."></textarea>
+                                    <textarea id="aesKeyInput" class="form-control mb-2" rows="2" placeholder="Clé AES (Base64)..."></textarea>
+                                    <button class="btn btn-aes w-100" id="doAESEncrypt">
+                                        <i class="fas fa-lock"></i> Chiffrer AES
+                                    </button>
+                                    <hr>
+                                    <label>Message chiffré (IV:Ciphertext) :</label>
+                                    <textarea id="aesEncryptedResult" class="form-control" rows="3" readonly placeholder="Résultat..."></textarea>
+                                    <button class="btn btn-sm btn-outline-secondary mt-1" onclick="copyText('aesEncryptedResult')">
+                                        <i class="fas fa-copy"></i> Copier
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hybride Chiffrement -->
+                <div id="hybrid-encrypt" class="method-content">
+                    <div class="card">
+                        <div class="card-header hybrid">
+                            <i class="fas fa-code-branch"></i> Chiffrement Hybride (RSA + AES)
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <i class="fas fa-star"></i> <strong>Comment ça marche ?</strong><br>
+                                1. Génère une clé AES aléatoire<br>
+                                2. Chiffre le message avec AES (rapide)<br>
+                                3. Chiffre la clé AES avec RSA (sécurisé)<br>
+                                4. Envoie les deux parties ensemble
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-download"></i> Clé publique destinataire</h6>
+                                    <textarea id="hybridPublicKey" class="form-control mb-2" rows="4" placeholder="Clé publique RSA du destinataire..."></textarea>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="copyText('hybridPublicKey')">Copier</button>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-lock"></i> Message à envoyer</h6>
+                                    <textarea id="hybridMessage" class="form-control mb-2" rows="3" placeholder="Message à chiffrer..."></textarea>
+                                    <button class="btn btn-hybrid w-100" id="doHybridEncrypt">
+                                        <i class="fas fa-code-branch"></i> Chiffrement Hybride
+                                    </button>
+                                </div>
+                            </div>
+                            <hr>
+                            <h6>Résultat du chiffrement hybride :</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Clé AES chiffrée (RSA) :</label>
+                                    <textarea id="hybridEncryptedKey" class="form-control mb-2" rows="3" readonly placeholder="Clé AES chiffrée..."></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Message chiffré (AES) :</label>
+                                    <textarea id="hybridEncryptedMsg" class="form-control mb-2" rows="3" readonly placeholder="Message chiffré..."></textarea>
+                                </div>
+                            </div>
+                            <label>Package complet (à envoyer) :</label>
+                            <textarea id="hybridCompletePackage" class="form-control" rows="3" readonly placeholder="Clé_chiffrée|Message_chiffré"></textarea>
+                            <button class="btn btn-sm btn-outline-secondary mt-1" onclick="copyText('hybridCompletePackage')">
+                                <i class="fas fa-copy"></i> Copier le package
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -359,27 +453,92 @@
 
             <!-- Page Déchiffrement -->
             <div id="dechiffrement-page" class="page" style="display:none;">
-                <div class="card">
-                    <div class="card-header">
-                        <i class="fas fa-unlock-alt"></i> Déchiffrement RSA
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label>Message chiffré (Base64) :</label>
-                            <textarea id="encryptedMessage" rows="5" class="form-control" placeholder="Collez le message chiffré..."></textarea>
+                <div class="method-tabs">
+                    <div class="method-tab rsa active" onclick="switchMethod('rsa-decrypt')">🔐 RSA</div>
+                    <div class="method-tab aes" onclick="switchMethod('aes-decrypt')">🔒 AES</div>
+                    <div class="method-tab hybrid" onclick="switchMethod('hybrid-decrypt')">🔗 Hybride</div>
+                </div>
+
+                <!-- RSA Déchiffrement -->
+                <div id="rsa-decrypt" class="method-content active">
+                    <div class="card">
+                        <div class="card-header rsa">
+                            <i class="fas fa-unlock-alt"></i> Déchiffrement RSA
                         </div>
-                        <div class="mb-3">
-                            <label>Clé Privée (PEM) :</label>
-                            <textarea id="decryptPrivateKey" rows="5" class="form-control" placeholder="Collez la clé privée..."></textarea>
-                        </div>
-                        <button class="btn btn-primary" id="decryptBtn">
-                            <i class="fas fa-unlock"></i> Déchiffrer le message
-                        </button>
-                        <hr>
-                        <div class="mb-3">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Message chiffré (Base64) :</label>
+                                    <textarea id="rsaDecryptInput" class="form-control mb-2" rows="4" placeholder="Collez le message chiffré..."></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Votre clé privée :</label>
+                                    <textarea id="rsaPrivateKeyDecrypt" class="form-control mb-2" rows="4" placeholder="Collez votre clé privée..."></textarea>
+                                </div>
+                            </div>
+                            <button class="btn btn-rsa w-100" id="doRSADecrypt">
+                                <i class="fas fa-unlock-alt"></i> Déchiffrer RSA
+                            </button>
+                            <hr>
                             <label>Message déchiffré :</label>
-                            <textarea id="decryptedResult" rows="4" class="form-control" readonly placeholder="Le message déchiffré apparaîtra ici..."></textarea>
-                            <div id="decryptError" class="text-danger mt-2" style="display:none;"></div>
+                            <textarea id="rsaDecryptResult" class="form-control" rows="3" readonly placeholder="Résultat..."></textarea>
+                            <div id="rsaDecryptError" class="text-danger mt-2" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AES Déchiffrement -->
+                <div id="aes-decrypt" class="method-content">
+                    <div class="card">
+                        <div class="card-header aes">
+                            <i class="fas fa-unlock-alt"></i> Déchiffrement AES
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Message chiffré (IV:Ciphertext) :</label>
+                                    <textarea id="aesDecryptInput" class="form-control mb-2" rows="4" placeholder="Collez le message chiffré..."></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Clé AES (Base64) :</label>
+                                    <textarea id="aesKeyDecrypt" class="form-control mb-2" rows="4" placeholder="Collez la clé AES..."></textarea>
+                                </div>
+                            </div>
+                            <button class="btn btn-aes w-100" id="doAESDecrypt">
+                                <i class="fas fa-unlock-alt"></i> Déchiffrer AES
+                            </button>
+                            <hr>
+                            <label>Message déchiffré :</label>
+                            <textarea id="aesDecryptResult" class="form-control" rows="3" readonly placeholder="Résultat..."></textarea>
+                            <div id="aesDecryptError" class="text-danger mt-2" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hybride Déchiffrement -->
+                <div id="hybrid-decrypt" class="method-content">
+                    <div class="card">
+                        <div class="card-header hybrid">
+                            <i class="fas fa-code-branch"></i> Déchiffrement Hybride
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Package reçu (Clé_chiffrée|Message_chiffré) :</label>
+                                    <textarea id="hybridPackageInput" class="form-control mb-2" rows="4" placeholder="Collez le package complet..."></textarea>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Votre clé privée RSA :</label>
+                                    <textarea id="hybridPrivateKeyDecrypt" class="form-control mb-2" rows="4" placeholder="Collez votre clé privée..."></textarea>
+                                </div>
+                            </div>
+                            <button class="btn btn-hybrid w-100" id="doHybridDecrypt">
+                                <i class="fas fa-code-branch"></i> Déchiffrement Hybride
+                            </button>
+                            <hr>
+                            <label>Message déchiffré :</label>
+                            <textarea id="hybridDecryptResult" class="form-control" rows="3" readonly placeholder="Résultat..."></textarea>
+                            <div id="hybridDecryptError" class="text-danger mt-2" style="display:none;"></div>
                         </div>
                     </div>
                 </div>
@@ -392,41 +551,27 @@
                         <i class="fas fa-signature"></i> Signature & Vérification Numérique
                     </div>
                     <div class="card-body">
-                        <h5>Signer un message</h5>
-                        <div class="mb-3">
-                            <label>Message à signer :</label>
-                            <textarea id="signMessage" rows="3" class="form-control" placeholder="Message à signer..."></textarea>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Signer un message</h5>
+                                <textarea id="signMessage" class="form-control mb-2" rows="3" placeholder="Message à signer..."></textarea>
+                                <textarea id="signPrivateKey" class="form-control mb-2" rows="3" placeholder="Clé privée RSA..."></textarea>
+                                <button class="btn btn-primary" id="signBtn">
+                                    <i class="fas fa-pen"></i> Générer la signature
+                                </button>
+                                <textarea id="signatureResult" class="form-control mt-2" rows="3" readonly placeholder="Signature..."></textarea>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Vérifier une signature</h5>
+                                <textarea id="verifyMessage" class="form-control mb-2" rows="3" placeholder="Message original..."></textarea>
+                                <textarea id="verifySignature" class="form-control mb-2" rows="3" placeholder="Signature..."></textarea>
+                                <textarea id="verifyPublicKey" class="form-control mb-2" rows="3" placeholder="Clé publique..."></textarea>
+                                <button class="btn btn-success" id="verifyBtn">
+                                    <i class="fas fa-check"></i> Vérifier la signature
+                                </button>
+                                <div id="verifyResult" class="mt-3 alert" style="display:none;"></div>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label>Clé Privée :</label>
-                            <textarea id="signPrivateKey" rows="5" class="form-control" placeholder="Collez votre clé privée..."></textarea>
-                        </div>
-                        <button class="btn btn-primary" id="signBtn">
-                            <i class="fas fa-pen"></i> Générer la signature
-                        </button>
-                        <hr>
-                        <div class="mb-3">
-                            <label>Signature (Base64) :</label>
-                            <textarea id="signatureResult" rows="3" class="form-control" readonly></textarea>
-                        </div>
-
-                        <h5 class="mt-4">Vérifier une signature</h5>
-                        <div class="mb-3">
-                            <label>Message original :</label>
-                            <textarea id="verifyMessage" rows="3" class="form-control" placeholder="Message original..."></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label>Signature à vérifier :</label>
-                            <textarea id="verifySignature" rows="3" class="form-control" placeholder="Signature Base64..."></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label>Clé Publique :</label>
-                            <textarea id="verifyPublicKey" rows="5" class="form-control" placeholder="Clé publique..."></textarea>
-                        </div>
-                        <button class="btn btn-success" id="verifyBtn">
-                            <i class="fas fa-check"></i> Vérifier la signature
-                        </button>
-                        <div id="verifyResult" class="mt-3 alert" style="display:none;"></div>
                     </div>
                 </div>
             </div>
@@ -438,37 +583,16 @@
                         <i class="fas fa-graduation-cap"></i> Documentation Cryptographique
                     </div>
                     <div class="card-body">
-                        <h3>1. Introduction</h3>
-                        <p>Dans un monde où les données sont sensibles, assurer leur sécurité est primordial. Cette application utilise les concepts fondamentaux de la cryptographie moderne.</p>
-                        
-                        <h3>2. Principe de Kerckhoffs</h3>
-                        <p>"Un système cryptographique doit être sécurisé même si tout est connu, sauf la clé secrète."<br>
-                        <strong>👉 La sécurité repose uniquement sur la clé et non sur l'algorithme.</strong></p>
-                        
-                        <h3>3. Échange de clés Diffie-Hellman</h3>
-                        <p>Permet d'échanger une clé secrète sur un canal non sécurisé. Cependant, il est vulnérable à l'<strong>attaque de l'homme du milieu (MITM)</strong>. La solution est l'utilisation de TLS et de certificats numériques pour authentifier les parties.</p>
-                        
-                        <h3>4. Chiffrement Asymétrique (RSA)</h3>
-                        <p>Utilisation de deux clés :</p>
-                        <ul>
-                            <li><strong>Clé publique</strong> → Chiffrement</li>
-                            <li><strong>Clé privée</strong> → Déchiffrement</li>
-                        </ul>
-                        <p><strong>Avantages :</strong> Sécurité, distribution facile des clés.<br>
-                        <strong>Limites :</strong> Lent → souvent combiné avec AES (chiffrement hybride).</p>
-                        
-                        <h3>5. Signature Numérique</h3>
-                        <p>Utilise un hachage (SHA-256) pour garantir l'intégrité et l'authenticité :</p>
-                        <ul>
-                            <li>Signature avec la clé privée</li>
-                            <li>Vérification avec la clé publique</li>
-                        </ul>
-                        
-                        <h3>6. Certificat X.509</h3>
-                        <p>Le rôle de l'Autorité de Certification (CA) est d'émettre des certificats qui lient une identité à une clé publique. La chaîne de confiance permet de vérifier l'authenticité. Limites : certificats auto-signés, attaques sur les CA.</p>
-                        
+                        <h3>1. Chiffrement Symétrique (AES)</h3>
+                        <p><strong>AES-256</strong> - Algorithme rapide pour gros volumes de données.</p>
+                        <h3>2. Chiffrement Asymétrique (RSA)</h3>
+                        <p><strong>RSA-2048</strong> - Distribution facile des clés, idéal pour échange.</p>
+                        <h3>3. Chiffrement Hybride</h3>
+                        <p>Combine RSA + AES : message chiffré avec AES, clé AES chiffrée avec RSA.</p>
+                        <h3>4. Principe de Kerckhoffs</h3>
+                        <p>La sécurité repose uniquement sur la clé.</p>
                         <div class="alert alert-info mt-4">
-                            <i class="fas fa-shield-alt"></i> <strong>Security First</strong> - Cette application respecte le principe de Kerckhoffs et ne stocke aucune clé privée.
+                            <i class="fas fa-shield-alt"></i> <strong>Security First</strong> - Tous les calculs sont locaux.
                         </div>
                     </div>
                 </div>
@@ -479,9 +603,10 @@
     <div class="toast-notification"></div>
 
     <script>
-        let currentRSA = null;
+        // Variables globales
         let currentPublicKey = "";
         let currentPrivateKey = "";
+        let currentAESKey = "";
 
         // Navigation
         document.querySelectorAll('.nav-link').forEach(link => {
@@ -492,7 +617,6 @@
                 document.getElementById(`${pageId}-page`).style.display = 'block';
                 document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
                 link.classList.add('active');
-                
                 if (window.innerWidth <= 768) {
                     document.getElementById('sidebar').classList.remove('active');
                 }
@@ -503,238 +627,255 @@
             document.getElementById('sidebar').classList.toggle('active');
         });
 
-        // Génération de clés
-        function generateKeys() {
-            const crypt = new JSEncrypt({default_key_size: "2048"});
-            const privateKey = crypt.getPrivateKey();
-            const publicKey = crypt.getPublicKey();
-            currentPublicKey = publicKey;
-            currentPrivateKey = privateKey;
+        function switchMethod(method) {
+            const encryptMethods = ['rsa-encrypt', 'aes-encrypt', 'hybrid-encrypt'];
+            const decryptMethods = ['rsa-decrypt', 'aes-decrypt', 'hybrid-decrypt'];
             
-            document.getElementById('publicKeyHome').innerHTML = publicKey;
-            document.getElementById('privateKeyHome').innerHTML = privateKey;
+            encryptMethods.forEach(m => {
+                const el = document.getElementById(m);
+                if(el) el.classList.remove('active');
+            });
+            decryptMethods.forEach(m => {
+                const el = document.getElementById(m);
+                if(el) el.classList.remove('active');
+            });
             
-            // Mettre à jour dans les autres formulaires
-            document.getElementById('encryptPublicKey').value = publicKey;
-            document.getElementById('decryptPrivateKey').value = privateKey;
-            document.getElementById('signPrivateKey').value = privateKey;
-            document.getElementById('verifyPublicKey').value = publicKey;
+            document.getElementById(method).classList.add('active');
             
-            showNotification("Clés RSA générées avec succès !", "success");
-            return {publicKey, privateKey};
+            document.querySelectorAll('.method-tab').forEach(tab => tab.classList.remove('active'));
+            const tabClass = method.includes('rsa') ? 'rsa' : (method.includes('aes') ? 'aes' : 'hybrid');
+            document.querySelectorAll(`.method-tab.${tabClass}`).forEach(tab => tab.classList.add('active'));
         }
 
-        document.getElementById('generateKeysHome')?.addEventListener('click', generateKeys);
-        
-        // Export clés
-        document.getElementById('exportPublicHome')?.addEventListener('click', () => {
-            if(currentPublicKey) downloadFile("public_key.pem", currentPublicKey);
-            else alert("Générez d'abord des clés !");
-        });
-        
-        document.getElementById('exportPrivateHome')?.addEventListener('click', () => {
-            if(currentPrivateKey) downloadFile("private_key.pem", currentPrivateKey);
-            else alert("Générez d'abord des clés !");
-        });
-        
-        document.getElementById('copyPublicHome')?.addEventListener('click', () => {
-            if(currentPublicKey) {
-                navigator.clipboard.writeText(currentPublicKey);
-                showNotification("Clé publique copiée !", "success");
-            } else {
-                alert("Générez d'abord des clés !");
-            }
-        });
-        
-        function downloadFile(filename, content) {
-            const blob = new Blob([content], {type: "text/plain"});
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = filename;
-            link.click();
-            URL.revokeObjectURL(link.href);
-        }
-        
         function showNotification(message, type) {
             const notification = document.createElement('div');
             notification.className = `alert alert-${type} alert-dismissible fade show`;
-            notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i> 
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            const container = document.querySelector('.toast-notification');
-            container.appendChild(notification);
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
+            notification.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+            document.querySelector('.toast-notification').appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
         }
-        
-        // Chiffrement
-        document.getElementById('encryptBtn')?.addEventListener('click', () => {
-            const message = document.getElementById('plainMessage').value;
-            const publicKey = document.getElementById('encryptPublicKey').value;
-            
-            if(!message || !publicKey) {
-                alert("Veuillez saisir un message et une clé publique");
-                return;
-            }
-            
-            if(message.length > 245) {
-                alert("Le message est trop long pour RSA 2048 bits. Maximum 245 caractères.");
-                return;
-            }
-            
-            try {
-                const crypt = new JSEncrypt();
-                crypt.setPublicKey(publicKey);
-                const encrypted = crypt.encrypt(message);
-                
-                if(encrypted) {
-                    document.getElementById('encryptedResult').value = encrypted;
-                    showNotification("Message chiffré avec succès !", "success");
-                } else {
-                    alert("Erreur de chiffrement. Vérifiez la clé publique.");
-                }
-            } catch(e) {
-                alert("Erreur : " + e.message);
-            }
-        });
-        
-        // Déchiffrement amélioré avec meilleure gestion des erreurs
-        document.getElementById('decryptBtn')?.addEventListener('click', () => {
-            const encryptedMsg = document.getElementById('encryptedMessage').value.trim();
-            const privateKey = document.getElementById('decryptPrivateKey').value.trim();
-            const errorDiv = document.getElementById('decryptError');
-            
-            if(!encryptedMsg || !privateKey) {
-                alert("Veuillez saisir le message chiffré et la clé privée");
-                return;
-            }
-            
-            try {
-                const crypt = new JSEncrypt();
-                crypt.setPrivateKey(privateKey);
-                
-                // Vérifier si la clé privée est valide
-                if(!crypt.getPrivateKey()) {
-                    errorDiv.style.display = 'block';
-                    errorDiv.innerHTML = "❌ Clé privée invalide. Vérifiez le format PEM.";
-                    return;
-                }
-                
-                const decrypted = crypt.decrypt(encryptedMsg);
-                
-                if(decrypted) {
-                    document.getElementById('decryptedResult').value = decrypted;
-                    errorDiv.style.display = 'none';
-                    showNotification("Message déchiffré avec succès !", "success");
-                } else {
-                    errorDiv.style.display = 'block';
-                    errorDiv.innerHTML = "❌ Échec du déchiffrement. Causes possibles :<br>" +
-                                         "- Clé privée incorrecte<br>" +
-                                         "- Message chiffré corrompu<br>" +
-                                         "- Message chiffré d'un autre navigateur (vérifiez l'encodage)<br>" +
-                                         "- La clé privée ne correspond pas à celle utilisée pour le chiffrement";
-                }
-            } catch(e) {
-                errorDiv.style.display = 'block';
-                errorDiv.innerHTML = "❌ Erreur technique : " + e.message;
-            }
-        });
-        
-        // Tester le déchiffrement localement
-        document.getElementById('testDecrypt')?.addEventListener('click', () => {
-            const encryptedMsg = document.getElementById('encryptedResult').value;
-            const privateKey = document.getElementById('decryptPrivateKey').value;
-            
-            if(!encryptedMsg || !privateKey) {
-                alert("Veuillez d'abord chiffrer un message et avoir une clé privée");
-                return;
-            }
-            
-            const crypt = new JSEncrypt();
-            crypt.setPrivateKey(privateKey);
-            const decrypted = crypt.decrypt(encryptedMsg);
-            
-            if(decrypted) {
-                alert("Test réussi ! Le message déchiffré est :\n\n" + decrypted);
-            } else {
-                alert("Test échoué. Vérifiez que la clé privée correspond à celle utilisée pour le chiffrement.");
-            }
-        });
-        
-        document.getElementById('copyEncrypted')?.addEventListener('click', () => {
-            const text = document.getElementById('encryptedResult').value;
-            if(text) {
+
+        function copyText(elementId) {
+            const el = document.getElementById(elementId);
+            const text = el.value || el.innerText;
+            if(text && text !== 'Non générée' && text !== 'Résultat...') {
                 navigator.clipboard.writeText(text);
-                showNotification("Message chiffré copié dans le presse-papier !", "success");
-            } else {
-                alert("Rien à copier");
+                showNotification("Copié !", "success");
             }
-        });
-        
-        // Signature (SHA-256 avec RSA)
-        document.getElementById('signBtn')?.addEventListener('click', () => {
-            const message = document.getElementById('signMessage').value;
-            const privateKey = document.getElementById('signPrivateKey').value;
-            if(!message || !privateKey) {
-                alert("Veuillez saisir un message et une clé privée");
-                return;
-            }
+        }
+
+        // ==================== RSA FUNCTIONS ====================
+        function generateRSAKeys() {
+            const crypt = new JSEncrypt({default_key_size: "2048"});
+            currentPrivateKey = crypt.getPrivateKey();
+            currentPublicKey = crypt.getPublicKey();
+            
+            document.getElementById('rsaPubKeyChiff').innerHTML = currentPublicKey;
+            document.getElementById('rsaPrivKeyChiff').innerHTML = currentPrivateKey;
+            document.getElementById('rsaPublicKeyInput').value = currentPublicKey;
+            document.getElementById('rsaPrivateKeyDecrypt').value = currentPrivateKey;
+            document.getElementById('signPrivateKey').value = currentPrivateKey;
+            document.getElementById('verifyPublicKey').value = currentPublicKey;
+            document.getElementById('hybridPublicKey').value = currentPublicKey;
+            document.getElementById('hybridPrivateKeyDecrypt').value = currentPrivateKey;
+            
+            showNotification("Clés RSA générées !", "success");
+        }
+
+        function rsaEncrypt() {
+            const msg = document.getElementById('rsaMessage').value;
+            const pubKey = document.getElementById('rsaPublicKeyInput').value;
+            if(!msg || !pubKey) { alert("Message et clé publique requis"); return; }
+            if(msg.length > 245) { alert("Message trop long (max 245 caractères)"); return; }
             try {
                 const crypt = new JSEncrypt();
-                crypt.setPrivateKey(privateKey);
-                const hash = CryptoJS.SHA256(message).toString(CryptoJS.enc.Base64);
-                const signature = crypt.sign(hash, CryptoJS.SHA256, "sha256");
-                if(signature) {
-                    document.getElementById('signatureResult').value = signature;
-                    showNotification("Signature générée avec succès !", "success");
+                crypt.setPublicKey(pubKey);
+                const encrypted = crypt.encrypt(msg);
+                if(encrypted) {
+                    document.getElementById('rsaEncryptedResult').value = encrypted;
+                    showNotification("Message RSA chiffré !", "success");
+                } else alert("Erreur chiffrement");
+            } catch(e) { alert("Erreur: "+e.message); }
+        }
+
+        function rsaDecrypt() {
+            const encrypted = document.getElementById('rsaDecryptInput').value.trim();
+            const privKey = document.getElementById('rsaPrivateKeyDecrypt').value.trim();
+            const errorDiv = document.getElementById('rsaDecryptError');
+            if(!encrypted || !privKey) { errorDiv.style.display='block'; errorDiv.innerHTML="Message et clé requis"; return; }
+            try {
+                const crypt = new JSEncrypt();
+                crypt.setPrivateKey(privKey);
+                const decrypted = crypt.decrypt(encrypted.replace(/\s/g, ''));
+                if(decrypted) {
+                    document.getElementById('rsaDecryptResult').value = decrypted;
+                    errorDiv.style.display = 'none';
+                    showNotification("Déchiffré !", "success");
                 } else {
-                    alert("Erreur de signature");
+                    errorDiv.style.display='block';
+                    errorDiv.innerHTML="Clé privée incorrecte";
                 }
-            } catch(e) {
-                alert("Erreur : " + e.message);
-            }
-        });
-        
-        // Vérification
-        document.getElementById('verifyBtn')?.addEventListener('click', () => {
-            const message = document.getElementById('verifyMessage').value;
-            const signature = document.getElementById('verifySignature').value;
-            const publicKey = document.getElementById('verifyPublicKey').value;
-            if(!message || !signature || !publicKey) {
-                alert("Veuillez remplir tous les champs");
-                return;
-            }
+            } catch(e) { errorDiv.style.display='block'; errorDiv.innerHTML="Erreur: "+e.message; }
+        }
+
+        // ==================== AES FUNCTIONS ====================
+        function generateAESKey() {
+            currentAESKey = CryptoJS.lib.WordArray.random(32).toString(CryptoJS.enc.Base64);
+            document.getElementById('aesKeyChiff').value = currentAESKey;
+            document.getElementById('aesKeyInput').value = currentAESKey;
+            document.getElementById('aesKeyDecrypt').value = currentAESKey;
+            showNotification("Clé AES-256 générée !", "success");
+        }
+
+        function aesEncrypt() {
+            const msg = document.getElementById('aesMessage').value;
+            const key = document.getElementById('aesKeyInput').value;
+            if(!msg || !key) { alert("Message et clé requis"); return; }
+            try {
+                const iv = CryptoJS.lib.WordArray.random(16);
+                const encrypted = CryptoJS.AES.encrypt(msg, CryptoJS.enc.Base64.parse(key), {
+                    iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7
+                });
+                const result = iv.toString(CryptoJS.enc.Base64) + ":" + encrypted.toString();
+                document.getElementById('aesEncryptedResult').value = result;
+                showNotification("Message AES chiffré !", "success");
+            } catch(e) { alert("Erreur: "+e.message); }
+        }
+
+        function aesDecrypt() {
+            const encryptedData = document.getElementById('aesDecryptInput').value.trim();
+            const key = document.getElementById('aesKeyDecrypt').value.trim();
+            const errorDiv = document.getElementById('aesDecryptError');
+            if(!encryptedData || !key) { errorDiv.style.display='block'; errorDiv.innerHTML="Données et clé requises"; return; }
+            try {
+                const parts = encryptedData.split(":");
+                if(parts.length !== 2) throw new Error("Format invalide");
+                const iv = CryptoJS.enc.Base64.parse(parts[0]);
+                const ciphertext = parts[1];
+                const decrypted = CryptoJS.AES.decrypt(ciphertext, CryptoJS.enc.Base64.parse(key), {
+                    iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7
+                });
+                const result = decrypted.toString(CryptoJS.enc.Utf8);
+                if(result) {
+                    document.getElementById('aesDecryptResult').value = result;
+                    errorDiv.style.display = 'none';
+                    showNotification("Déchiffré !", "success");
+                } else throw new Error("Déchiffrement échoué");
+            } catch(e) { errorDiv.style.display='block'; errorDiv.innerHTML="Erreur: "+e.message; }
+        }
+
+        // ==================== HYBRID FUNCTIONS ====================
+        function hybridEncrypt() {
+            const msg = document.getElementById('hybridMessage').value;
+            const pubKey = document.getElementById('hybridPublicKey').value;
+            if(!msg || !pubKey) { alert("Message et clé publique requis"); return; }
+            try {
+                const aesKey = CryptoJS.lib.WordArray.random(32);
+                const aesKeyBase64 = aesKey.toString(CryptoJS.enc.Base64);
+                const iv = CryptoJS.lib.WordArray.random(16);
+                const encryptedMsg = CryptoJS.AES.encrypt(msg, aesKey, {
+                    iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7
+                });
+                const encryptedMsgWithIv = iv.toString(CryptoJS.enc.Base64) + ":" + encryptedMsg.toString();
+                const crypt = new JSEncrypt();
+                crypt.setPublicKey(pubKey);
+                const encryptedKey = crypt.encrypt(aesKeyBase64);
+                if(!encryptedKey) throw new Error("Échec chiffrement RSA");
+                document.getElementById('hybridEncryptedKey').value = encryptedKey;
+                document.getElementById('hybridEncryptedMsg').value = encryptedMsgWithIv;
+                const complete = encryptedKey + "|" + encryptedMsgWithIv;
+                document.getElementById('hybridCompletePackage').value = complete;
+                showNotification("Chiffrement hybride réussi !", "success");
+            } catch(e) { alert("Erreur: "+e.message); }
+        }
+
+        function hybridDecrypt() {
+            const packageData = document.getElementById('hybridPackageInput').value.trim();
+            const privKey = document.getElementById('hybridPrivateKeyDecrypt').value.trim();
+            const errorDiv = document.getElementById('hybridDecryptError');
+            if(!packageData || !privKey) { errorDiv.style.display='block'; errorDiv.innerHTML="Package et clé privée requis"; return; }
+            try {
+                const parts = packageData.split("|");
+                if(parts.length !== 2) throw new Error("Format invalide");
+                const encryptedKey = parts[0];
+                const encryptedMsgWithIv = parts[1];
+                const crypt = new JSEncrypt();
+                crypt.setPrivateKey(privKey);
+                const aesKeyBase64 = crypt.decrypt(encryptedKey);
+                if(!aesKeyBase64) throw new Error("Échec déchiffrement RSA de la clé");
+                const msgParts = encryptedMsgWithIv.split(":");
+                if(msgParts.length !== 2) throw new Error("Format message invalide");
+                const iv = CryptoJS.enc.Base64.parse(msgParts[0]);
+                const ciphertext = msgParts[1];
+                const decrypted = CryptoJS.AES.decrypt(ciphertext, CryptoJS.enc.Base64.parse(aesKeyBase64), {
+                    iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7
+                });
+                const result = decrypted.toString(CryptoJS.enc.Utf8);
+                if(result) {
+                    document.getElementById('hybridDecryptResult').value = result;
+                    errorDiv.style.display = 'none';
+                    showNotification("Déchiffrement hybride réussi !", "success");
+                } else throw new Error("Déchiffrement échoué");
+            } catch(e) { errorDiv.style.display='block'; errorDiv.innerHTML="Erreur: "+e.message; }
+        }
+
+        // ==================== SIGNATURE ====================
+        document.getElementById('signBtn')?.addEventListener('click', () => {
+            const msg = document.getElementById('signMessage').value;
+            const privKey = document.getElementById('signPrivateKey').value;
+            if(!msg || !privKey) { alert("Message et clé privée requis"); return; }
             try {
                 const crypt = new JSEncrypt();
-                crypt.setPublicKey(publicKey);
-                const hash = CryptoJS.SHA256(message).toString(CryptoJS.enc.Base64);
-                const isValid = crypt.verify(hash, signature, CryptoJS.SHA256);
+                crypt.setPrivateKey(privKey);
+                const hash = CryptoJS.SHA256(msg).toString(CryptoJS.enc.Base64);
+                const sig = crypt.sign(hash, CryptoJS.SHA256, "sha256");
+                if(sig) {
+                    document.getElementById('signatureResult').value = sig;
+                    showNotification("Signature générée !", "success");
+                } else alert("Erreur signature");
+            } catch(e) { alert("Erreur: "+e.message); }
+        });
+
+        document.getElementById('verifyBtn')?.addEventListener('click', () => {
+            const msg = document.getElementById('verifyMessage').value;
+            const sig = document.getElementById('verifySignature').value;
+            const pubKey = document.getElementById('verifyPublicKey').value;
+            if(!msg || !sig || !pubKey) { alert("Tous les champs requis"); return; }
+            try {
+                const crypt = new JSEncrypt();
+                crypt.setPublicKey(pubKey);
+                const hash = CryptoJS.SHA256(msg).toString(CryptoJS.enc.Base64);
+                const isValid = crypt.verify(hash, sig, CryptoJS.SHA256);
                 const resultDiv = document.getElementById('verifyResult');
                 resultDiv.style.display = 'block';
                 if(isValid) {
                     resultDiv.className = "alert alert-success";
-                    resultDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✓ Signature valide ! Le message est authentique et non modifié.';
+                    resultDiv.innerHTML = '✓ Signature valide !';
                 } else {
                     resultDiv.className = "alert alert-danger";
-                    resultDiv.innerHTML = '<i class="fas fa-times-circle"></i> ✗ Signature invalide ! Le message a peut-être été altéré.';
+                    resultDiv.innerHTML = '✗ Signature invalide !';
                 }
-            } catch(e) {
-                alert("Erreur de vérification: " + e.message);
-            }
+            } catch(e) { alert("Erreur: "+e.message); }
         });
-        
-        // Génération automatique au chargement
+
+        // Écouteurs
+        document.getElementById('genRSAKeysChiff')?.addEventListener('click', generateRSAKeys);
+        document.getElementById('doRSAEncrypt')?.addEventListener('click', rsaEncrypt);
+        document.getElementById('doRSADecrypt')?.addEventListener('click', rsaDecrypt);
+        document.getElementById('genAESKeyChiff')?.addEventListener('click', generateAESKey);
+        document.getElementById('doAESEncrypt')?.addEventListener('click', aesEncrypt);
+        document.getElementById('doAESDecrypt')?.addEventListener('click', aesDecrypt);
+        document.getElementById('doHybridEncrypt')?.addEventListener('click', hybridEncrypt);
+        document.getElementById('doHybridDecrypt')?.addEventListener('click', hybridDecrypt);
+
+        // Initialisation
         setTimeout(() => {
-            generateKeys();
+            generateRSAKeys();
+            generateAESKey();
         }, 100);
-        
-        // Ajouter un exemple de message
-        window.exampleMessage = function() {
-            document.getElementById('plainMessage').value = "Ceci est un message secret chiffré avec RSA 2048 bits. La cryptographie asymétrique permet d'échanger des informations de manière sécurisée sans partager la clé privée.";
-        };
+
+        window.switchMethod = switchMethod;
+        window.copyText = copyText;
     </script>
 </body>
 </html>
